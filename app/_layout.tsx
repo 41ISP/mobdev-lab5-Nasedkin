@@ -27,14 +27,10 @@ export default function RootLayout() {
   ]
   const [tasks, setTasks] = useState([...initialTasks])
   const colorScheme = useColorScheme();
-  
+
   const [task, setTask] = useState('')
   const toggleSwitch = (id: string) => {
-    tasks.map((el) => {
-      if(el.id === id){
-        el.state = !el.state
-      }
-    })
+    setTasks((old) => old.map((tsk) => tsk.id === id? {...tsk, state: !tsk.state}: tsk))
   }
 
   const [loaded] = useFonts({
@@ -53,23 +49,38 @@ export default function RootLayout() {
 
 
   const handleSubmit = () => {
-    setTasks([
-      ...tasks,
-      {id: nanoid(), task: task, state: false}
-    ])
-    alert("👉Задача добавлена👈")
+    if(task.trim().length > 0 && task.trim().length < 20)
+    {
+      setTasks([
+        ...tasks,
+        {id: nanoid(), task: task.trim(), state: false}
+      ])
+    }
+    else alert("Пустая строка, или слишком много символов (допустимо не больше 20)")
   }
 
   const handlePress = () => {
-    setTasks([
-      ...tasks,
-      {id: nanoid(), task: task, state: false}
-    ])
-    alert("👉Задача добавлена👈")
+    if(task.trim().length > 0 && task.trim().length <= 20)
+    {
+      setTasks([
+        ...tasks,
+        {id: nanoid(), task: task.trim(), state: false}
+      ])
+    }
+    else alert("Пустая строка, или слишком много символов (допустимо не больше 20)")
   }
   const handleDelete = (id:string) => {
     setTasks(tasks.filter(a => a.id !== id))
   }
+
+  const [filteredTasks, setFilteredTasks] = useState([...tasks])
+
+  const filteredList = () => {
+    const temp = setFilteredTasks(
+      (tasks.filter(task => {return task.state === false})
+    )
+  }
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <View style={styles.container}>
@@ -134,8 +145,10 @@ const styles = StyleSheet.create({
   input:{
     color: "goldenrod",
     fontSize: 32,
-    padding: 10.,
+    padding: 10,
+    textAlign: 'center',
     margin: 20,
+    maxWidth: 300,
     borderRadius: 50,
     borderWidth: 2,
     borderColor: "goldenrod",
@@ -146,9 +159,20 @@ const styles = StyleSheet.create({
     backgroundColor: "darkred",
     fontSize: 20,
     margin: 10,
-    textAlign: "center"
+    textAlign: "center",
+    flexGrow: 1,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "goldenrod",
+    maxWidth: 150,
+    width: "100%"
   },
   cntr:{
-    flexDirection: "row"
+    flexDirection: "row",
+    flexGrow: 1,
+    width: "100%",
+    alignItems: "center",
+    alignContent: "center",
+    alignSelf: "center",
   }
 });
