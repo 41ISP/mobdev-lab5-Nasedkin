@@ -12,6 +12,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { FlatList } from 'react-native';
 import { customAlphabet } from 'nanoid/non-secure';
 import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
+import { ITodo } from '@/entities/todo/todo.model';
+import { create } from 'zustand';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -20,29 +22,20 @@ export default function RootLayout() {
   const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10)
   const initialTasks = [
     {
-      task: "123",
+      name: "123",
       id: nanoid(),
-      state: false
+      state: true
     }
-  ]
-  const initialFilter = [
-    {
-      id: nanoid(),
-      state: false
-    }
-  ]
-  const [tasks, setTasks] = useState([...initialTasks])
+  ] as ITodo[]
+  // const [tasks, setTasks] = useState<ITodo[]>([...initialTasks])
+  const [filteredTasks, setFilteredTasks] = useState<ITodo[]>()
   const colorScheme = useColorScheme();
 
   const [task, setTask] = useState('')
   const toggleSwitch = (id: string) => {
     setTasks((old) => old.map((tsk) => tsk.id === id ? { ...tsk, state: !tsk.state } : tsk))
   }
-  const [activeFilter, setActiveFilter] = useState([...initialFilter])
-  const handleFilterActive = (id: string) => {
-    setActiveFilter((old) => old.map((filt) => filt.id === id ? {...filt, state: !filt.state} : filt))
-  }
-  
+  const [activeFilter, setActiveFilter] = useState(false)  
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -53,6 +46,17 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(()=>{
+    setFilteredTasks([...tasks])
+  }, [])
+
+  useEffect(()=>{
+    if(activeFilter){
+      setFilteredTasks(tasks.filter((filt) => filt.state === false))
+    }else setFilteredTasks(tasks)
+
+  }, [tasks, activeFilter])
+
   if (!loaded) {
     return null;
   }
@@ -62,7 +66,7 @@ export default function RootLayout() {
     if (task.trim().length > 0 && task.trim().length < 20) {
       setTasks([
         ...tasks,
-        { id: nanoid(), task: task.trim(), state: false }
+        { id: nanoid(), name: task.trim(), state: false }
       ])
       setTask('')
     }
@@ -88,7 +92,7 @@ export default function RootLayout() {
             Фильтр
           </Text>
           <Switch value = {activeFilter}
-                  onValueChange={handleFilterActive}
+                  onValueChange={setActiveFilter}
                   trackColor={{ false: '#767577', true: '#81b0ff' }}/>
         </View>
         <TouchableOpacity onPress={handleSubmit}>
@@ -96,7 +100,7 @@ export default function RootLayout() {
               Добавить
           </Text>
         </TouchableOpacity>
-        <FlatList data={tasks} keyExtractor={(item) => item.id} renderItem={(
+        <FlatList data={filteredTasks} keyExtractor={(item) => item.id} renderItem={(
           { item },
         ) => (
           <View style={styles.cntr}>
@@ -104,8 +108,8 @@ export default function RootLayout() {
               <Text style={styles.list}>
                 Х
               </Text>
-            </TouchableOpacity >
-            <Text style={styles.list}>{item.task}</Text>
+            </TouchableOpacity>
+            <Text style={styles.list}>{item.name}</Text>
             <Switch value={item.state}
               onValueChange={() => toggleSwitch(item.id)}
               thumbColor={item.state ? "yellow" : "red"}
