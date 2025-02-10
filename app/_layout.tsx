@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { FlatList } from 'react-native';
 import { customAlphabet } from 'nanoid/non-secure';
 import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
-import { ITodo } from '@/entities/todo/todo.model';
+import { ITask, useStorage } from '@/entities/todo/todo.model';
 import { create } from 'zustand';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -26,16 +26,14 @@ export default function RootLayout() {
       id: nanoid(),
       state: true
     }
-  ] as ITodo[]
-  // const [tasks, setTasks] = useState<ITodo[]>([...initialTasks])
-  const [filteredTasks, setFilteredTasks] = useState<ITodo[]>()
+  ] as ITask[]
+  const [tasks, setTasks] = useState<ITask[]>([...initialTasks])
+  const [filteredTasks, setFilteredTasks] = useState<ITask[]>()
   const colorScheme = useColorScheme();
-
+  const {addTask, deleteTask, toggleSwitch} = useStorage()  
   const [task, setTask] = useState('')
-  const toggleSwitch = (id: string) => {
-    setTasks((old) => old.map((tsk) => tsk.id === id ? { ...tsk, state: !tsk.state } : tsk))
-  }
   const [activeFilter, setActiveFilter] = useState(false)  
+  
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -69,6 +67,7 @@ export default function RootLayout() {
         { id: nanoid(), name: task.trim(), state: false }
       ])
       setTask('')
+      
     }
     else alert("Пустая строка, или слишком много символов (допустимо не больше 20)")
   }
