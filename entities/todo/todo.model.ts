@@ -18,9 +18,9 @@ export const useStorage = create<IStorage>()(
     persist(
         (set) => ({
             tasks: [],
-            addTask: (task) => set((a) => ({ ...a.tasks, tasks: [...a.tasks, task] })),
-            deleteTask: (id) => set((state) => ({ ...state.tasks, tasks: state.tasks.filter((task) => task.id !== id) })),
-            toggleSwitch: (id) => set((state) => ({...state.tasks, tasks: state.tasks.map((tsk) => tsk.id === id ? { ...tsk, state: !tsk.state } : tsk)}))
+            addTask: (task) => set((a) => ({ ...a, tasks: [...a.tasks, task] })),
+            deleteTask: (id) => set((state) => ({ ...state, tasks: state.tasks.filter((task) => task.id !== id) })),
+            toggleSwitch: (id) => set((state) => ({...state, tasks: state.tasks.map((tsk) => tsk.id === id ? { ...tsk, state: !tsk.state } : tsk)}))
         }), {
         name: "taskName",
         storage: createJSONStorage(() => AsyncStorage)

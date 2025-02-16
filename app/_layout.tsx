@@ -30,10 +30,10 @@ export default function RootLayout() {
   const [tasks, setTasks] = useState<ITask[]>([...initialTasks])
   const [filteredTasks, setFilteredTasks] = useState<ITask[]>()
   const colorScheme = useColorScheme();
-  const {addTask, deleteTask, toggleSwitch} = useStorage()  
+  const { addTask, deleteTask, toggleSwitch } = useStorage()
   const [task, setTask] = useState('')
-  const [activeFilter, setActiveFilter] = useState(false)  
-  
+  const [activeFilter, setActiveFilter] = useState(false)
+
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -44,14 +44,14 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setFilteredTasks([...tasks])
   }, [])
 
-  useEffect(()=>{
-    if(activeFilter){
+  useEffect(() => {
+    if (activeFilter) {
       setFilteredTasks(tasks.filter((filt) => filt.state === false))
-    }else setFilteredTasks(tasks)
+    } else setFilteredTasks(tasks)
 
   }, [tasks, activeFilter])
 
@@ -62,18 +62,16 @@ export default function RootLayout() {
 
   const handleSubmit = () => {
     if (task.trim().length > 0 && task.trim().length < 20) {
-      setTasks([
-        ...tasks,
+      addTask(
         { id: nanoid(), name: task.trim(), state: false }
-      ])
+      )
       setTask('')
-      
     }
     else alert("Пустая строка, или слишком много символов (допустимо не больше 20)")
   }
 
   const handleDelete = (id: string) => {
-    setTasks(tasks.filter(a => a.id !== id))
+    deleteTask(id)
   }
 
   return (
@@ -90,13 +88,13 @@ export default function RootLayout() {
           <Text style={styles.text}>
             Фильтр
           </Text>
-          <Switch value = {activeFilter}
-                  onValueChange={setActiveFilter}
-                  trackColor={{ false: '#767577', true: '#81b0ff' }}/>
+          <Switch value={activeFilter}
+            onValueChange={setActiveFilter}
+            trackColor={{ false: '#767577', true: '#81b0ff' }} />
         </View>
         <TouchableOpacity onPress={handleSubmit}>
           <Text style={styles.btn}>
-              Добавить
+            Добавить
           </Text>
         </TouchableOpacity>
         <FlatList data={filteredTasks} keyExtractor={(item) => item.id} renderItem={(
@@ -114,7 +112,7 @@ export default function RootLayout() {
               thumbColor={item.state ? "yellow" : "red"}
               trackColor={{ false: '#767577', true: '#81b0ff' }} />
           </View>
-        )}/>
+        )} />
       </View>
     </ThemeProvider>
   );
@@ -135,11 +133,11 @@ const styles = StyleSheet.create({
     maxWidth: 350,
     minWidth: 350
   },
-  text:{
+  text: {
     color: 'goldenrod',
     fontSize: 14,
   },
-  switch:{
+  switch: {
     flexDirection: 'row',
     color: "goldenrod",
     backgroundColor: "darkred",
